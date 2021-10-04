@@ -3,6 +3,9 @@ package api
 import (
 	"log"
 	"net/http"
+	"time"
+
+	"github.com/gorilla/mux"
 
 	"github.com/dc7303/rails-brocker/brocker"
 )
@@ -29,9 +32,18 @@ func (s *Server) HandleRequests() {
 	}
 
 	log.Println("Run server :10000")
-	http.HandleFunc("/", s.calculate)
 
-	err := http.ListenAndServe(":10000", nil)
+	router := mux.NewRouter()
+	router.HandleFunc("/", s.calculate).Methods("POST")
+
+	srv := &http.Server{
+		Addr:         "0.0.0.0:10000",
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      router,
+	}
+	err := srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
