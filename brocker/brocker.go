@@ -1,17 +1,21 @@
 package brocker
 
 import (
+	"context"
 	"io"
 	"log"
 	"os/exec"
 	"path"
+
+	"github.com/dc7303/rails-brocker/brocker/storage"
 )
 
 type Brocker struct {
-	dir    string
-	stdin  io.WriteCloser
-	stdout io.ReadCloser
-	stderr io.ReadCloser
+	dir     string
+	stdin   io.WriteCloser
+	stdout  io.ReadCloser
+	stderr  io.ReadCloser
+	storage *storage.Storage
 }
 
 func New(dir string) *Brocker {
@@ -21,6 +25,15 @@ func New(dir string) *Brocker {
 }
 
 func (b *Brocker) Run() {
+	strg := storage.New("localhost:11101")
+	if err := strg.Run(); err != nil {
+		log.Fatal(err)
+	}
+	ctx := context.Background()
+	if err := strg.Close(ctx); err != nil {
+		log.Fatal(err)
+	}
+
 	cmd := exec.Command(
 		path.Join(b.dir, "bin/bundle"),
 		"exec",

@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dc7303/rails-brocker/pkg/brocker"
+	"github.com/dc7303/rails-brocker/brocker"
 )
 
 type Server struct {
