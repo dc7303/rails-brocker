@@ -24,7 +24,9 @@ func (s *Server) calculate(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandleRequests() {
 	log.Println("Run brocker")
-	s.brocker.Run()
+	if err := s.brocker.Run(); err != nil {
+		log.Fatal(err)
+	}
 	defer s.brocker.Close()
 
 	log.Println("Run server :10000")

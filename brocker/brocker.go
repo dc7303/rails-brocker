@@ -24,14 +24,16 @@ func New(dir string) *Brocker {
 	}
 }
 
-func (b *Brocker) Run() {
+func (b *Brocker) Run() error {
+	log.Println("Run brocker")
+
 	strg := storage.New("localhost:11101")
 	if err := strg.Run(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	ctx := context.Background()
 	if err := strg.Close(ctx); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	cmd := exec.Command(
@@ -45,23 +47,22 @@ func (b *Brocker) Run() {
 	var err error
 	b.stdin, err = cmd.StdinPipe()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	// defer b.stdin.Close()
 
 	b.stdout, err = cmd.StdoutPipe()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	b.stderr, err = cmd.StderrPipe()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	reader := io.MultiReader(b.stdout, b.stderr)
 	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	go func() {
@@ -75,6 +76,8 @@ func (b *Brocker) Run() {
 			log.Printf(string(out[:n]))
 		}
 	}()
+
+	return nil
 }
 
 func (b *Brocker) Write(text string) {

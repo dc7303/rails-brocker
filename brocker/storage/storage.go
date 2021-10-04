@@ -22,6 +22,8 @@ func New(addr string) *Storage {
 }
 
 func (s *Storage) Run() error {
+	log.Println("Run storage")
+
 	var err error
 	s.cli, err = client.Dial(s.addr)
 	if err != nil {
@@ -39,7 +41,6 @@ func (s *Storage) Run() error {
 		return err
 	}
 
-	log.Println("Run storage")
 	log.Println("Create document: test-collection$doc")
 
 	return nil
