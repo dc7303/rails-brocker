@@ -6,6 +6,7 @@ import (
 
 	"github.com/yorkie-team/yorkie/client"
 	"github.com/yorkie-team/yorkie/pkg/document"
+	"github.com/yorkie-team/yorkie/pkg/document/proxy"
 )
 
 type Storage struct {
@@ -13,6 +14,8 @@ type Storage struct {
 
 	cli *client.Client
 	doc *document.Document
+
+	logLen int
 }
 
 func New(addr string) *Storage {
@@ -41,7 +44,28 @@ func (s *Storage) Run() error {
 		return err
 	}
 
+	err = s.doc.Update(func(root *proxy.ObjectProxy) error {
+		root.SetNewText("log")
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
 	log.Println("Create document: test-collection$doc")
+
+	return nil
+}
+
+func (s *Storage) Write(logText string) error {
+	if err := s.doc.Update(func(root *proxy.ObjectProxy) error {
+		text := root.GetText("log")
+		text.Edit(s.logLen, s.logLen, logText)
+		s.logLen += len(logText)
+		return nil
+	}); err != nil {
+		return err
+	}
 
 	return nil
 }

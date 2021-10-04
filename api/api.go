@@ -27,13 +27,16 @@ func (s *Server) HandleRequests() {
 	if err := s.brocker.Run(); err != nil {
 		log.Fatal(err)
 	}
-	defer s.brocker.Close()
 
 	log.Println("Run server :10000")
 	http.HandleFunc("/", s.calculate)
 
 	err := http.ListenAndServe(":10000", nil)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = s.brocker.Close(); err != nil {
 		log.Fatal(err)
 	}
 }

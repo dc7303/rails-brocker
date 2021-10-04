@@ -11,10 +11,12 @@ import (
 )
 
 type Brocker struct {
-	dir     string
-	stdin   io.WriteCloser
-	stdout  io.ReadCloser
-	stderr  io.ReadCloser
+	dir string
+
+	stdin  io.WriteCloser
+	stdout io.ReadCloser
+	stderr io.ReadCloser
+
 	storage *storage.Storage
 }
 
@@ -25,14 +27,8 @@ func New(dir string) *Brocker {
 }
 
 func (b *Brocker) Run() error {
-	log.Println("Run brocker")
-
-	strg := storage.New("localhost:11101")
-	if err := strg.Run(); err != nil {
-		return err
-	}
-	ctx := context.Background()
-	if err := strg.Close(ctx); err != nil {
+	b.storage = storage.New("localhost:11101")
+	if err := b.storage.Run(); err != nil {
 		return err
 	}
 
@@ -73,7 +69,9 @@ func (b *Brocker) Run() error {
 				log.Fatal(err)
 			}
 
-			log.Printf(string(out[:n]))
+			if err = b.storage.Write(string(out[:n])); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}()
 
@@ -84,7 +82,7 @@ func (b *Brocker) Write(text string) {
 	b.stdin.Write([]byte(text))
 }
 
-func (b *Brocker) Close() {
+func (b *Brocker) Close() error {
 	if b.stdin != nil {
 		b.stdin.Close()
 	}
@@ -94,4 +92,11 @@ func (b *Brocker) Close() {
 	if b.stderr != nil {
 		b.stderr.Close()
 	}
+
+	ctx := context.Background()
+	if err := b.storage.Close(ctx); err != nil {
+		return err
+	}
+
+	return nil
 }
