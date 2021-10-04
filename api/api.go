@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -20,8 +19,7 @@ func New() *Server {
 }
 
 func (s *Server) calculate(w http.ResponseWriter, r *http.Request) {
-	s.brocker.Write("12 36 +p\n")
-	fmt.Fprintf(w, "Welcom")
+	s.brocker.Write("Article\n")
 }
 
 func (s *Server) HandleRequests() {
@@ -31,6 +29,7 @@ func (s *Server) HandleRequests() {
 
 	log.Println("Run server :10000")
 	http.HandleFunc("/", s.calculate)
+
 	err := http.ListenAndServe(":10000", nil)
 	if err != nil {
 		log.Fatal(err)
