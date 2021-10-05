@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -9,6 +11,10 @@ import (
 
 	"github.com/dc7303/rails-brocker/brocker"
 )
+
+type writeCodeBody struct {
+	Code string `json:code`
+}
 
 type Server struct {
 	brocker *brocker.Brocker
@@ -21,8 +27,16 @@ func New() *Server {
 	}
 }
 
-func (s *Server) calculate(w http.ResponseWriter, r *http.Request) {
-	s.brocker.Write("Article\n")
+func (s *Server) writeCode(w http.ResponseWriter, r *http.Request) {
+	var wcb writeCodeBody
+	err := json.NewDecoder(r.Body).Decode(&wcb)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	log.Println("[input code] ", wcb.Code)
+
+	s.brocker.Write(fmt.Sprintf("%s\n", wcb.Code))
 }
 
 func (s *Server) HandleRequests() {
@@ -34,7 +48,7 @@ func (s *Server) HandleRequests() {
 	log.Println("Run server :10000")
 
 	router := mux.NewRouter()
-	router.HandleFunc("/", s.calculate).Methods("POST")
+	router.HandleFunc("/", s.writeCode).Methods("POST")
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:10000",
