@@ -45,7 +45,9 @@ func (s *Storage) Run() error {
 	}
 
 	err = s.doc.Update(func(root *proxy.ObjectProxy) error {
-		root.SetNewText("log")
+		if root.GetText("log") == nil {
+			root.SetNewText("log")
+		}
 		return nil
 	})
 	if err != nil {
@@ -66,6 +68,8 @@ func (s *Storage) Write(logText string) error {
 	}); err != nil {
 		return err
 	}
+	ctx := context.Background()
+	s.cli.Sync(ctx)
 
 	return nil
 }

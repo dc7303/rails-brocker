@@ -69,6 +69,7 @@ func (b *Brocker) Run() error {
 				log.Fatal(err)
 			}
 
+			log.Println(string(out[:n]))
 			if err = b.storage.Write(string(out[:n])); err != nil {
 				log.Fatal(err)
 			}
