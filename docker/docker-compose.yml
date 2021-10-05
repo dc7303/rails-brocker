@@ -11,7 +11,6 @@ services:
     ports:
       - '8080:8080'
       - '9901:9901'
-    command: ['/etc/envoy/envoy.yaml']
     depends_on:
       - yorkie
     # If you're using Mac or Windows, this special domain name("host.docker.internal" which makes containers able to connect to the host)
@@ -19,10 +18,12 @@ services:
     # But if you're using Linux and want an envoy container to communicate with the host,
     # it may help to define "host.docker.internal" in extra_hosts. 
     # (Actually, other hostnames are available, but in that case you should update clusters[].host configurations of envoy.yaml)
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
   yorkie:
-    image: 'yorkieteam/yorkie:latest'
+    volumes:
+    - ./yorkie.json:/app/yorkie.json
+    image: 'yorkieteam/yorkie:0.1.6'
     container_name: 'yorkie'
     command: [
       'agent',
