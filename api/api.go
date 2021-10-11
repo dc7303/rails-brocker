@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/dc7303/rails-brocker/brocker"
@@ -21,7 +22,7 @@ type Server struct {
 }
 
 func New() *Server {
-	dir := "/Users/scott/Workspace/dc7303/rails-brocker/rails-study/blog"
+	dir := "/Users/choedongcheol/Workspace/rails-brocker/rails-study/blog"
 	return &Server{
 		brocker: brocker.New(dir),
 	}
@@ -47,8 +48,14 @@ func (s *Server) HandleRequests() {
 
 	log.Println("Run server :10000")
 
+	cors := handlers.CORS(
+		handlers.AllowedHeaders([]string{"content-type"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowCredentials(),
+	)
 	router := mux.NewRouter()
-	router.HandleFunc("/", s.writeCode).Methods("POST")
+	router.HandleFunc("/", s.writeCode).Methods("POST", "OPTIONS")
+	router.Use(cors)
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:10000",

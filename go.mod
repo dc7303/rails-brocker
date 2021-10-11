@@ -2,14 +2,18 @@ module github.com/dc7303/rails-brocker
 
 go 1.17
 
-require github.com/yorkie-team/yorkie v0.1.6
+require (
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/yorkie-team/yorkie v0.1.6
+)
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/uuid v1.0.0 // indirect
-	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/rs/xid v1.2.1 // indirect
 	go.uber.org/atomic v1.5.0 // indirect
 	go.uber.org/multierr v1.3.0 // indirect
